@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<framework>
+    <frameworkname>MyFirstTool</frameworkname>
+    <tool>
+        <tooltype>OSINT</tooltype>
+        <programname>theHarvester</programname>
+        <command>theharvester -d [domain] -l 500 -b all -h [URL]</command>
+    </tool>
+    <tool>
+        <tooltype>IP-Info</tooltype>
+        <programname>Whois</programname>
+        <command>whois [domainname]</command>
+    </tool>
+    <tool>
+        <tooltype>IP-Info</tooltype>
+        <programname>host</programname>
+        <command>host [domain]</command>
+        <command>host -l [domain]</command>
+        <command>host -l [domain] [dns_server]</command>
+    </tool>
+    <tool>
+        <tooltype>IP-Info</tooltype>
+        <programname>host</programname>
+        <command>dnsrescon -r [CIDR]</command>
+        <command>dnsrecon -D /usr/share/dnsrecon/namelist.txt -d [domain] -t brt -v</command>
+    </tool>
+    <tool>
+        <tooltype>Scan</tooltype>
+        <programname>Nmap</programname>
+        <command>nmap -Pn [hostname]</command>
+        <command>nmap -sn [hostname]</command>
+    </tool>
+    <tool>
+        <tooltype>Eumeration</tooltype>
+        <programname>Dirb</programname>
+        <command>dirb [hostname]</command>
+    </tool>
+    <tool>
+        <tooltype>Others Commands</tooltype>
+        <programname>Servicios locales</programname>
+        <command>less /usr/share/nmap/nmap-</command>
+        <command>sudo netstat -plunt</command>
+        <command>less /etc/services</command>
+        <comments></comments>
+    </tool>
+</framework>
