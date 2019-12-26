@@ -4,7 +4,7 @@ import re
 import os
 sys.stdout.write("\033[1;34m")
 # use the parse() function to load and parse an XML file
-doc = ET.parse("luxpr3.xml")
+doc = ET.parse("tools.xml")
 root = doc.getroot()
 ToolTypes = dict()
 frameworkname = root.find("./frameworkname")
@@ -50,26 +50,44 @@ def showCommands(fname, ttypes, type, tool):
     print()
     while True:
         try:
+            sys.stdout.write("\033[1;32m")
             option = int(input("Escoge el comando : "))
+            sys.stdout.write("\033[1;34m")
             if 0 < option < ncommands or option == 999:
                 break
             else:
+                sys.stdout.write("\033[1;31m")
                 print("Error : Opción no válida")
+                sys.stdout.write("\033[1;34m")
         except ValueError:
+            sys.stdout.write("\033[1;31m")
             print("Error : Opción no válida")
+            sys.stdout.write("\033[1;34m")
     if option == 999:
         showTools(fname, ttypes, type)
     selectedcommand = commandsoptions[option]
-    print(selectedcommand)
     allmatches = re.findall(r"\[[^\]]+\]", selectedcommand)
     for match in allmatches:
         start=selectedcommand.find(match)
         end=start+len(match)
+        sys.stdout.write("\033[1;32m")
         variable=str(input("Indica el valor de la variable "+match[1:-1]+" : "))
+        sys.stdout.write("\033[1;34m")
         selectedcommand = selectedcommand[:start]+variable+selectedcommand[end:]
-    print(selectedcommand)
-    os.system(selectedcommand)
-    input("Press Enter to continue : ")
+    print()
+    sys.stdout.write("\033[1;33m")
+    print("Ejecutando : ",selectedcommand)
+    sys.stdout.write("\033[1;35m")
+    print()
+    commandoutput = os.system(selectedcommand)
+    sys.stdout.write("\033[1;33m")
+    print()
+    if commandoutput == 0:
+        input("La ejecución del comando ha terminado exitosamente. Pulsa Enter para continuar : ")
+    else:
+        sys.stdout.write("\033[1;31m")
+        input("La ejecución del comando ha finalizado con una salida inesperada, comprueba la salida y pulsa Enter para continuar : ")
+    sys.stdout.write("\033[1;34m")
     showTools(fname, ttypes, type)
 
 def showTools(fname, ttypes, type):
@@ -86,13 +104,19 @@ def showTools(fname, ttypes, type):
     print()
     while True:
         try:
+            sys.stdout.write("\033[1;32m")
             option = int(input("Escoge la herramienta a utilizar : "))
+            sys.stdout.write("\033[1;34m")
             if 0 < option < ntools or option == 999:
                 break
             else:
+                sys.stdout.write("\033[1;31m")
                 print("Error : Opción no válida")
+                sys.stdout.write("\033[1;34m")
         except ValueError:
+            sys.stdout.write("\033[1;31m")
             print("Error : Opción no válida")
+            sys.stdout.write("\033[1;34m")
     if option == 999:
         executeFramework(fname, ttypes)
     selectedtool = toolsoptions[option]
@@ -113,13 +137,19 @@ def executeFramework(fname,ttypes):
     print()
     while True:
         try:
+            sys.stdout.write("\033[1;32m")
             option = int(input("Escoge el tipo de herramienta : "))
+            sys.stdout.write("\033[1;34m")
             if 0 < option < ntypes or option == 999:
                 break
             else:
+                sys.stdout.write("\033[1;31m")
                 print("Error : Opción no válida")
+                sys.stdout.write("\033[1;34m")
         except ValueError:
+            sys.stdout.write("\033[1;31m")
             print("Error : Opción no válida")
+            sys.stdout.write("\033[1;34m")
     if option == 999:
         exit(0)
     selectedtype = typeoptions[option]
@@ -128,9 +158,11 @@ try:
     executeFramework(frameworkname, ToolTypes)
 except KeyboardInterrupt:
     print()
+    sys.stdout.write("\033[1;31m")
     print("OK. Saliendo...")
     sys.exit()
 except EOFError:
     print()
+    sys.stdout.write("\033[1;31m")
     print("OK. Saliendo...")
     sys.exit()
