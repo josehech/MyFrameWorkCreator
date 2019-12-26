@@ -38,9 +38,9 @@
     <tool>
         <tooltype>Others Commands</tooltype>
         <programname>Servicios locales</programname>
-        <command>less /usr/share/nmap/nmap-</command>
-        <command>sudo netstat -plunt</command>
-        <command>less /etc/services</command>
+        <command comment="#Lista de puertos comunes">less /usr/share/nmap/nmap-</command>
+        <command comment="#Servicios activos">sudo netstat -plunt</command>
+        <command comment="#Relacion puerto-servicio (si nmap está instalado)">less /etc/services</command>
         <comments></comments>
     </tool>
 </framework>
