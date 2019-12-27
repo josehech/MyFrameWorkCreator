@@ -5,8 +5,13 @@ Pentesting-Framework-Creator es un script que permite crear nuestro propio entor
 1. Se crea un fichero XML con el formato que tiene el archivo tools.xml
 2. Se ejecuta el script MyFrameworkName.py con python3
     ~~~
-    python3 MyframworkName.py
+    python3 MyFrameworkName.py
     ~~~
+![Inicio](./screenshot.png)
+![Types](./screenshot_1.png)
+![Tools](./screenshot_2.png)
+![variables](./screenshot_3.png)
+![Ejecucion](./screenshot_4.png)
 ### Features
 - Automatización de un conjunto de comandos
 - Creación automática de Banner a partir del nombre
