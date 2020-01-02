@@ -2,6 +2,8 @@ import sys
 import xml.etree.ElementTree as ET
 import re
 import os
+import sqlite3 as dbapi
+import argparse
 from pyfiglet import Figlet
 
 
@@ -58,16 +60,37 @@ def showCommands(fname, ttypes, type, tool):
     print("Ejecutando : ",selectedcommand)
     sys.stdout.write(execolor)
     print()
-    commandoutput = os.system(selectedcommand)
+    c.execute('SELECT * FROM '+args['bbdd']+' WHERE (tooltype=? AND toolname=? AND command=?)', (type, tool, selectedcommand))
+    entry = c.fetchone()
+    if entry is None:
+        commandoutput = os.system(selectedcommand + ' 2>&1 | tee ./output.txt')
+        with open("./output.txt", "r") as outputfile:
+            terminaltext = outputfile.read()
+        c.execute("INSERT INTO "+args['bbdd']+" VALUES (?, ?, ?, ?)", (type,tool,selectedcommand,str(terminaltext)))
+        bbdd.commit()
+    else:
+        if args['recheck']:
+            commandoutput = os.system(selectedcommand + ' 2>&1 | tee ./output.txt')
+            with open("./output.txt", "r") as outputfile:
+                terminaltext = outputfile.read()
+            c.execute('DELETE FROM '+args['bbdd']+' WHERE (tooltype=? AND toolname=? AND command=?)', (type, tool, selectedcommand))
+            bbdd.commit()
+            c.execute("INSERT INTO "+args['bbdd']+" VALUES (?, ?, ?, ?)", (type, tool, selectedcommand, str(terminaltext)))
+            bbdd.commit()
+        else:
+            commandoutput = 0
+            sys.stdout.write(warningcolor)
+            print('Se ha encontrado una ejecución previa en la BBDD')
+
     sys.stdout.write(messagecolor)
     print()
     if commandoutput == 0:
-        input("La ejecución del comando ha terminado exitosamente. Pulsa Enter para continuar : ")
+        input("La ejecución ha finalizado. Comprueba la salida y pulsa Enter para continuar : ")
     else:
         sys.stdout.write(warningcolor)
-        input("La ejecución del comando ha finalizado con una salida inesperada, comprueba la salida y pulsa Enter para continuar : ")
+        input("La ejecución ha finalizado con una salida inesperada, compruebala y pulsa Enter para continuar : ")
     sys.stdout.write(primary)
-    showTools(fname, ttypes, type)
+    showCommands(fname, ttypes, type,tool)
 
 
 def showTools(fname, ttypes, type):
@@ -131,12 +154,25 @@ def executeFramework(fname,ttypes):
             print("Error : Opción no válida")
             sys.stdout.write(primary)
     if option == 999:
+        c.close()
+        bbdd.close()        
         exit(0)
     selectedtype = typeoptions[option]
     showTools(fname,ttypes,selectedtype)
 
 if __name__== "__main__":
-    #MAIN
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-b', '--bbdd', default='testing')
+    parser.add_argument('-r', '--recheck', action='store_true')
+    args = vars(parser.parse_args())
+    print(args['bbdd'])
+    print(args['recheck'])
+    print('HOLA')
+    #BBDD
+    bbdd = dbapi.connect("bbdd.dat")
+    c = bbdd.cursor()
+    c.execute("create table if not exists "+args['bbdd']+" (tooltype text, toolname text, command text, result text)")
+    
     # use the parse() function to load and parse an XML file
     doc = ET.parse("tools.xml")
     root = doc.getroot()
@@ -177,9 +213,13 @@ if __name__== "__main__":
         print()
         sys.stdout.write(warningcolor)
         print("OK. Saliendo...")
+        c.close()
+        bbdd.close()
         sys.exit()
     except EOFError:
         print()
         sys.stdout.write(warningcolor)
         print("OK. Saliendo...")
+        c.close()
+        bbdd.close()
         sys.exit()

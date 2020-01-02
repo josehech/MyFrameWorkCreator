@@ -1,7 +1,12 @@
 # v0.0.3a
 Añadido:
+- BBDD por defecto
+- Argparse con los argumentos "-b" para bbdd y "-r" para recheck
 
 Modificado:
+- Al ejecutar un comando se vuelven a listar los comandos para la herramienta
+- Si el comando ya existe en la bbdd y no esta activado el recheck, cancela la ejecución
+- Mensajes al finalizar la ejecución (Se recomienda comprobar la salida siempre)
 
 Eliminado:
 
@@ -22,4 +27,3 @@ Modificado:
 - Ahora la etiqueta frameworkname está dentro de frameworkproperties
 
 Eliminado:
-
