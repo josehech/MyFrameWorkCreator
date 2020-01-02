@@ -2,37 +2,16 @@ import sys
 import xml.etree.ElementTree as ET
 import re
 import os
-sys.stdout.write("\033[1;34m")
-# use the parse() function to load and parse an XML file
-doc = ET.parse("tools.xml")
-root = doc.getroot()
-ToolTypes = dict()
-frameworkname = root.find("./frameworkname")
-for tool in root.findall("./tool"):
-    type = tool.find("./tooltype")
-    if type is None:
-        print("Error : Todas las Tools deben tener la etiqueta 'tooltype'")
-        exit(1)
-    if type.text not in ToolTypes:
-        ToolTypes[type.text] = dict()
-    programname = tool.find("./programname")
-    if programname is None:
-        print("Error : Todas las Tools deben tener la etiqueta 'programname'")
-        exit(1)
-    if programname.text not in ToolTypes[type.text]:
-        ToolTypes[type.text][programname.text] = []
-    for commands in tool.findall("./command"):
-        ToolTypes[type.text][programname.text].append((commands.text,commands.attrib))
+from pyfiglet import Figlet
+
 
 def showBanner():
-    print("%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%")
-    print("|                                                 |")
-    print("|                                                 |")
-    print("|                   MY FRAMEWORK                  |")
-    print("|                                                 |")
-    print("|                                                 |")
-    print("%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%")
+    custom_fig = Figlet(font=style)
+    ascii_banner = custom_fig.renderText(frameworkname)
+    print(ascii_banner)
     print()
+
+
 def showCommands(fname, ttypes, type, tool):
     os.system("clear")
     showBanner()
@@ -50,19 +29,19 @@ def showCommands(fname, ttypes, type, tool):
     print()
     while True:
         try:
-            sys.stdout.write("\033[1;32m")
+            sys.stdout.write(inputcolor)
             option = int(input("Escoge el comando : "))
-            sys.stdout.write("\033[1;34m")
+            sys.stdout.write(primary)
             if 0 < option < ncommands or option == 999:
                 break
             else:
-                sys.stdout.write("\033[1;31m")
+                sys.stdout.write(warningcolor)
                 print("Error : Opción no válida")
-                sys.stdout.write("\033[1;34m")
+                sys.stdout.write(primary)
         except ValueError:
-            sys.stdout.write("\033[1;31m")
+            sys.stdout.write(warningcolor)
             print("Error : Opción no válida")
-            sys.stdout.write("\033[1;34m")
+            sys.stdout.write(primary)
     if option == 999:
         showTools(fname, ttypes, type)
     selectedcommand = commandsoptions[option]
@@ -70,25 +49,26 @@ def showCommands(fname, ttypes, type, tool):
     for match in allmatches:
         start=selectedcommand.find(match)
         end=start+len(match)
-        sys.stdout.write("\033[1;32m")
+        sys.stdout.write(inputcolor)
         variable=str(input("Indica el valor de la variable "+match[1:-1]+" : "))
-        sys.stdout.write("\033[1;34m")
+        sys.stdout.write(primary)
         selectedcommand = selectedcommand[:start]+variable+selectedcommand[end:]
     print()
-    sys.stdout.write("\033[1;33m")
+    sys.stdout.write(messagecolor)
     print("Ejecutando : ",selectedcommand)
-    sys.stdout.write("\033[1;35m")
+    sys.stdout.write(execolor)
     print()
     commandoutput = os.system(selectedcommand)
-    sys.stdout.write("\033[1;33m")
+    sys.stdout.write(messagecolor)
     print()
     if commandoutput == 0:
         input("La ejecución del comando ha terminado exitosamente. Pulsa Enter para continuar : ")
     else:
-        sys.stdout.write("\033[1;31m")
+        sys.stdout.write(warningcolor)
         input("La ejecución del comando ha finalizado con una salida inesperada, comprueba la salida y pulsa Enter para continuar : ")
-    sys.stdout.write("\033[1;34m")
+    sys.stdout.write(primary)
     showTools(fname, ttypes, type)
+
 
 def showTools(fname, ttypes, type):
     os.system("clear")
@@ -104,19 +84,19 @@ def showTools(fname, ttypes, type):
     print()
     while True:
         try:
-            sys.stdout.write("\033[1;32m")
+            sys.stdout.write(inputcolor)
             option = int(input("Escoge la herramienta a utilizar : "))
-            sys.stdout.write("\033[1;34m")
+            sys.stdout.write(primary)
             if 0 < option < ntools or option == 999:
                 break
             else:
-                sys.stdout.write("\033[1;31m")
+                sys.stdout.write(warningcolor)
                 print("Error : Opción no válida")
-                sys.stdout.write("\033[1;34m")
+                sys.stdout.write(primary)
         except ValueError:
-            sys.stdout.write("\033[1;31m")
+            sys.stdout.write(warningcolor)
             print("Error : Opción no válida")
-            sys.stdout.write("\033[1;34m")
+            sys.stdout.write(primary)
     if option == 999:
         executeFramework(fname, ttypes)
     selectedtool = toolsoptions[option]
@@ -137,32 +117,69 @@ def executeFramework(fname,ttypes):
     print()
     while True:
         try:
-            sys.stdout.write("\033[1;32m")
+            sys.stdout.write(inputcolor)
             option = int(input("Escoge el tipo de herramienta : "))
-            sys.stdout.write("\033[1;34m")
+            sys.stdout.write(primary)
             if 0 < option < ntypes or option == 999:
                 break
             else:
-                sys.stdout.write("\033[1;31m")
+                sys.stdout.write(warningcolor)
                 print("Error : Opción no válida")
-                sys.stdout.write("\033[1;34m")
+                sys.stdout.write(primary)
         except ValueError:
-            sys.stdout.write("\033[1;31m")
+            sys.stdout.write(warningcolor)
             print("Error : Opción no válida")
-            sys.stdout.write("\033[1;34m")
+            sys.stdout.write(primary)
     if option == 999:
         exit(0)
     selectedtype = typeoptions[option]
     showTools(fname,ttypes,selectedtype)
-try:
-    executeFramework(frameworkname, ToolTypes)
-except KeyboardInterrupt:
-    print()
-    sys.stdout.write("\033[1;31m")
-    print("OK. Saliendo...")
-    sys.exit()
-except EOFError:
-    print()
-    sys.stdout.write("\033[1;31m")
-    print("OK. Saliendo...")
-    sys.exit()
+
+if __name__== "__main__":
+    #MAIN
+    # use the parse() function to load and parse an XML file
+    doc = ET.parse("tools.xml")
+    root = doc.getroot()
+    ToolTypes = dict()
+    #name
+    frameworkname = root.find("./frameworkproperties/frameworkname").text
+    #style
+    if root.find("./frameworkproperties/style") is None:
+        style = 'banner3'    
+    else:
+        style = root.find("./frameworkproperties/style").text
+
+    for tool in root.findall("./tool"):
+        type = tool.find("./tooltype")
+        if type is None:
+            print("Error : Todas las Tools deben tener la etiqueta 'tooltype'")
+            exit(1)
+        if type.text not in ToolTypes:
+            ToolTypes[type.text] = dict()
+        programname = tool.find("./programname")
+        if programname is None:
+            print("Error : Todas las Tools deben tener la etiqueta 'programname'")
+            exit(1)
+        if programname.text not in ToolTypes[type.text]:
+            ToolTypes[type.text][programname.text] = []
+        for commands in tool.findall("./command"):
+            ToolTypes[type.text][programname.text].append((commands.text,commands.attrib))
+    #colors
+    primary = "\033[1;34m"
+    inputcolor = "\033[1;32m"
+    messagecolor = "\033[1;33m"
+    warningcolor = "\033[1;31m"
+    execolor = "\033[1;35m"
+    try:
+        sys.stdout.write(primary)
+        executeFramework(frameworkname, ToolTypes)
+    except KeyboardInterrupt:
+        print()
+        sys.stdout.write(warningcolor)
+        print("OK. Saliendo...")
+        sys.exit()
+    except EOFError:
+        print()
+        sys.stdout.write(warningcolor)
+        print("OK. Saliendo...")
+        sys.exit()

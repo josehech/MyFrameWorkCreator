@@ -1,39 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <framework>
-    <frameworkname>MyFirstTool</frameworkname>
+    <frameworkproperties>
+        <frameworkname>MyFramework</frameworkname>
+        <style>banner3</style>
+    </frameworkproperties>
     <tool>
         <tooltype>OSINT</tooltype>
-        <programname>theHarvester</programname>
-        <command>theharvester -d [domain] -l 500 -b all -h [URL]</command>
-    </tool>
-    <tool>
-        <tooltype>IP-Info</tooltype>
         <programname>Whois</programname>
         <command>whois [domainname]</command>
     </tool>
     <tool>
-        <tooltype>IP-Info</tooltype>
+        <tooltype>OSINT</tooltype>
         <programname>host</programname>
         <command>host [domain]</command>
         <command>host -l [domain]</command>
         <command>host -l [domain] [dns_server]</command>
     </tool>
     <tool>
-        <tooltype>IP-Info</tooltype>
-        <programname>host</programname>
+        <tooltype>OSINT</tooltype>
+        <programname>dnsrecon</programname>
         <command>dnsrescon -r [CIDR]</command>
         <command>dnsrecon -D /usr/share/dnsrecon/namelist.txt -d [domain] -t brt -v</command>
     </tool>
     <tool>
-        <tooltype>Scan</tooltype>
+        <tooltype>Scan-Enum</tooltype>
         <programname>Nmap</programname>
         <command>nmap -Pn [hostname]</command>
         <command>nmap -sn [CIDR]</command>
     </tool>
     <tool>
-        <tooltype>Eumeration</tooltype>
+        <tooltype>Scan-Enum</tooltype>
         <programname>Dirb</programname>
         <command>dirb [hostname]</command>
+    </tool>
+    <tool>
+        <tooltype>Exploits</tooltype>
+        <programname>FTP</programname>
+        <command comment="#FTP-Bruteforce Exploit">hydra -L /usr/share/wordlists/dirb/common.txt -P /usr/share/wordlists/dirb/common.txt -s [PUERTO] -e nsr -v -V -I [IP] ftp</command>
+    </tool>
+    <tool>
+        <tooltype>Post-Exploit</tooltype>
+        <programname>FTP</programname>
+        <command comment="#FTP-DirListing Exploit">lftp -u '[USER],[PASSWORD]' -p [PUERTO] [IP] -e "find -d 4 .;exit"</command>
     </tool>
     <tool>
         <tooltype>Others Commands</tooltype>
@@ -41,11 +49,5 @@
         <command comment="#Relacion puerto-servicio (si nmap está instalado)">less /usr/share/nmap/nmap-services</command>
         <command comment="#Servicios activos">sudo netstat -plunt</command>
         <command comment="#Lista de puertos comunes">less /etc/services</command>
-    </tool>
-    <tool>
-        <tooltype>Exploits</tooltype>
-        <programname>FTP</programname>
-        <command comment="#FTP-Bruteforce Exploit">hydra -L /usr/share/wordlists/dirb/common.txt -P /usr/share/wordlists/dirb/common.txt -s [PUERTO] -e nsr -v -V -I [IP] ftp</command>
-        <command comment="#FTP-DirListing Exploit">lftp -u '[USER],[PASSWORD]' -p [PUERTO] [IP] -e "find -d 4 .;exit"</command>
     </tool>
 </framework>
