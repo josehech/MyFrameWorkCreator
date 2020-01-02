@@ -2,7 +2,7 @@
 <framework>
     <frameworkproperties>
         <frameworkname>MyFramework</frameworkname>
-        <style>banner3</style>
+        <style>standard</style>
     </frameworkproperties>
     <tool>
         <tooltype>OSINT</tooltype>

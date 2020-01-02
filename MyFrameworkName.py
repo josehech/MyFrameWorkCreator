@@ -181,7 +181,7 @@ if __name__== "__main__":
     frameworkname = root.find("./frameworkproperties/frameworkname").text
     #style
     if root.find("./frameworkproperties/style") is None:
-        style = 'banner3'    
+        style = 'standard'    
     else:
         style = root.find("./frameworkproperties/style").text
 
