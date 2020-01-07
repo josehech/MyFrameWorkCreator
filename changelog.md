@@ -2,11 +2,13 @@
 Añadido:
 - BBDD por defecto
 - Argparse con los argumentos "-b" para bbdd y "-r" para recheck
+- Salida de la ejecución guardada en la bbdd
 
 Modificado:
 - Al ejecutar un comando se vuelven a listar los comandos para la herramienta
 - Si el comando ya existe en la bbdd y no esta activado el recheck, cancela la ejecución
 - Mensajes al finalizar la ejecución (Se recomienda comprobar la salida siempre)
+- Mensaje que indica la existencia de la opción recheck
 
 Eliminado:
 

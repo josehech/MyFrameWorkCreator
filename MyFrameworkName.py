@@ -80,7 +80,11 @@ def showCommands(fname, ttypes, type, tool):
         else:
             commandoutput = 0
             sys.stdout.write(warningcolor)
-            print('Se ha encontrado una ejecución previa en la BBDD')
+            print('Se ha encontrado una ejecución previa en la BBDD. La salida ha sido la siguiente:')         
+            sys.stdout.write(execolor)
+            print(entry[3])
+            sys.stdout.write(messagecolor)
+            print('Para volver a ejecutar el comando utiliza la opción -r o --recheck al ejecutar MyFrameworkName.py')
 
     sys.stdout.write(messagecolor)
     print()
@@ -165,9 +169,6 @@ if __name__== "__main__":
     parser.add_argument('-b', '--bbdd', default='testing')
     parser.add_argument('-r', '--recheck', action='store_true')
     args = vars(parser.parse_args())
-    print(args['bbdd'])
-    print(args['recheck'])
-    print('HOLA')
     #BBDD
     bbdd = dbapi.connect("bbdd.dat")
     c = bbdd.cursor()
