@@ -60,22 +60,22 @@ def showCommands(fname, ttypes, type, tool):
     print("Ejecutando : ",selectedcommand)
     sys.stdout.write(execolor)
     print()
-    c.execute('SELECT * FROM '+args['bbdd']+' WHERE (tooltype=? AND toolname=? AND command=?)', (type, tool, selectedcommand))
+    c.execute('SELECT * FROM '+args['table']+' WHERE (tooltype=? AND toolname=? AND command=?)', (type, tool, selectedcommand))
     entry = c.fetchone()
     if entry is None:
         commandoutput = os.system(selectedcommand + ' 2>&1 | tee ./output.txt')
         with open("./output.txt", "r") as outputfile:
             terminaltext = outputfile.read()
-        c.execute("INSERT INTO "+args['bbdd']+" VALUES (?, ?, ?, ?)", (type,tool,selectedcommand,str(terminaltext)))
+        c.execute("INSERT INTO "+args['table']+" VALUES (?, ?, ?, ?)", (type,tool,selectedcommand,str(terminaltext)))
         bbdd.commit()
     else:
         if args['recheck']:
             commandoutput = os.system(selectedcommand + ' 2>&1 | tee ./output.txt')
             with open("./output.txt", "r") as outputfile:
                 terminaltext = outputfile.read()
-            c.execute('DELETE FROM '+args['bbdd']+' WHERE (tooltype=? AND toolname=? AND command=?)', (type, tool, selectedcommand))
+            c.execute('DELETE FROM '+args['table']+' WHERE (tooltype=? AND toolname=? AND command=?)', (type, tool, selectedcommand))
             bbdd.commit()
-            c.execute("INSERT INTO "+args['bbdd']+" VALUES (?, ?, ?, ?)", (type, tool, selectedcommand, str(terminaltext)))
+            c.execute("INSERT INTO "+args['table']+" VALUES (?, ?, ?, ?)", (type, tool, selectedcommand, str(terminaltext)))
             bbdd.commit()
         else:
             commandoutput = 0
@@ -166,13 +166,13 @@ def executeFramework(fname,ttypes):
 
 if __name__== "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-b', '--bbdd', default='testing')
+    parser.add_argument('-t', '--table', default='testing')
     parser.add_argument('-r', '--recheck', action='store_true')
     args = vars(parser.parse_args())
     #BBDD
     bbdd = dbapi.connect("bbdd.dat")
     c = bbdd.cursor()
-    c.execute("create table if not exists "+args['bbdd']+" (tooltype text, toolname text, command text, result text)")
+    c.execute("create table if not exists "+args['table']+" (tooltype text, toolname text, command text, result text)")
     
     # use the parse() function to load and parse an XML file
     doc = ET.parse("tools.xml")
