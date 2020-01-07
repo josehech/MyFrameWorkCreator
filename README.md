@@ -14,5 +14,4 @@ Pentesting-Framework-Creator es un script que permite crear nuestro propio entor
 ![Ejecucion](./screenshot_4.png)
 ### Features
 - Automatización de un conjunto de comandos
-- Creación automática de Banner a partir del nombre
-- Etiqueta XML <installation>
+- Generación de informe/dashboard a partir de la bbdd
