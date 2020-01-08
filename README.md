@@ -19,8 +19,8 @@ MyFrameWorkCreator es un script que permite crear nuestro propio entorno de trab
 -c config_file, --config_file   #Fichero que asigna valors por defecto a los parámetros
 ~~~
 ### Features
-[x] BBDD
-[x] Archivo para almacenar el valor de los parámetros por defecto (conf.txt)
-[x] Creación automática de Banner a partir del nombre
-[x] Automatización de un conjunto de comandos
-[ ] Generación de informe/dashboard a partir de la bbdd
+- [x] BBDD
+- [x] Archivo para almacenar el valor de los parámetros por defecto (conf.txt)
+- [x] Creación automática de Banner a partir del nombre
+- [x] Automatización de un conjunto de comandos
+- [ ] Generación de informe/dashboard a partir de la bbdd
