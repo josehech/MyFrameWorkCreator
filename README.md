@@ -14,8 +14,9 @@ MyFrameWorkCreator es un script que permite crear nuestro propio entorno de trab
 ![Ejecucion](./screenshot_4.png)
 ### Opciones
 ~~~sh
--r , --recheck Flag que indica al script que debe ejecutar los comandos aunque se encuentren en la BBDD (CUIDADO, borra los datos anteriores)
--t table_name , --table table_name Nombre de la tabla que guardará los datos de los comandos ejecutados (por defecto testing)
+-r , --recheck  #Flag que fuerza ejecutar los comandos aunque se encuentren en la BBDD (CUIDADO, borra los datos anteriores)
+-t table_name , --table table_name  #Tabla que guardará los datos de los comandos ejecutados (por defecto testing)
+-c config_file, --config_file   #Fichero que asigna valors por defecto a los parámetros
 ~~~
 ### Features
 - Automatización de un conjunto de comandos

@@ -3,7 +3,8 @@ Añadido:
 - BBDD por defecto
 - Argparse con los argumentos "-b" para bbdd y "-r" para recheck
 - Salida de la ejecución guardada en la bbdd
-- Archivo de configuración config.txt
+- Argumento -c CONFIG, --config CONFIG
+- Archivo de configuración personalizado
 - Archivo requeriments.txt 
 
 Modificado:
