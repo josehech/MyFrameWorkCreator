@@ -83,7 +83,10 @@ def showCommands(ttypes, type, tool):
     for command in ttypes[type][tool]:
         commandsoptions[ncommands] = command[0]
         if 'comment' in command[1]:
-            print("[" + str(ncommands) + "]", command[0], '\t'+command[1]['comment'])
+            print("[" + str(ncommands) + "]", command[0],end='')
+            sys.stdout.write(messagecolor)
+            print('\t'+command[1]['comment'])
+            sys.stdout.write(primary)
         else:
             print("[" + str(ncommands) + "]", command[0])
         ncommands += 1
