@@ -6,12 +6,14 @@ Añadido:
 - Argumento -c CONFIG, --config CONFIG
 - Archivo de configuración personalizado
 - Archivo requeriments.txt 
+- Opcion -2 para ejecutar todos los comandos de una herramienta
 
 Modificado:
 - Al ejecutar un comando se vuelven a listar los comandos para la herramienta
 - Si el comando ya existe en la bbdd y no esta activado el recheck, cancela la ejecución
 - Mensajes al finalizar la ejecución (Se recomienda comprobar la salida siempre)
 - Mensaje que indica la existencia de la opción recheck
+- Opción -1 para volver
 
 Eliminado:
 
