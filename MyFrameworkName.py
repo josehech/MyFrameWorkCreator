@@ -61,7 +61,11 @@ def showCommands(fname, ttypes, type, tool):
         start=selectedcommand.find(match)
         end=start+len(match)
         sys.stdout.write(inputcolor)
-        variable=str(input("Indica el valor de la variable "+match[1:-1]+" : "))
+        if match[1:-1] not in configuracion.keys():
+            variable=str(input("Indica el valor del parámetro "+match[1:-1]+" : "))
+        else:
+            print('Asignando el valor',str(configuracion[match[1:-1]]),'al parámetro',match[1:-1])
+            variable = configuracion[match[1:-1]]
         sys.stdout.write(primary)
         selectedcommand = selectedcommand[:start]+variable+selectedcommand[end:]
     print()
@@ -188,9 +192,7 @@ def executeFramework(fname,ttypes):
 
     # Si es 999 salir
     if option == 999:
-        c.close()
-        bbdd.close()        
-        exit(0)
+        return
 
     # Guarda la opción seleccionada
     selectedtype = typeoptions[option]
@@ -202,27 +204,29 @@ if __name__== "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-t', '--table', default='testing')
     parser.add_argument('-r', '--recheck', action='store_true')
+    parser.add_argument('-c', '--config')
     args = vars(parser.parse_args())
 
     # Fichero conf.txt
-    configuracion = dict()
-    try:
-        conf = open("config.txt")
-        linea = conf.readline()
-        while linea:
-            if len(linea) != 0:
-                splited = str(linea).split("=", 1)
-                if len(splited) != 2:
-                    print("Error en el archivo de configuración")
-                    exit(1)
-                param = splited[0].strip()
-                val = splited[1].strip()
-                configuracion[param] = val
+    if args['config'] != None:
+        configuracion = dict()
+        try:
+            conf = open(args['config'])
             linea = conf.readline()
-        conf.close()
-    except IOError:
-        print("Fichero de configuración (conf.txt) no encontrado")
-        input("Pulsa Enter para continuar sin el archivo de configuración : ")
+            while linea:
+                if len(linea) != 0:
+                    splited = str(linea).split("=", 1)
+                    if len(splited) != 2:
+                        print("Error en el archivo de configuración")
+                        exit(1)
+                    param = splited[0].strip()
+                    val = splited[1].strip()
+                    configuracion[param] = val
+                linea = conf.readline()
+            conf.close()
+        except IOError:
+            print("Fichero de configuración",args['config'],"no encontrado")
+            input("Pulsa Enter para continuar sin el archivo de configuración : ")
 
     # BBDD
     bbdd = dbapi.connect("bbdd.dat")
@@ -276,14 +280,13 @@ if __name__== "__main__":
         print()
         sys.stdout.write(warningcolor)
         print("OK. Saliendo...")
-        c.close()
-        bbdd.close()
-        sys.exit()
     except EOFError:
         # Ctrl + D
         print()
         sys.stdout.write(warningcolor)
         print("OK. Saliendo...")
+    finally:
         c.close()
         bbdd.close()
         sys.exit()
+
