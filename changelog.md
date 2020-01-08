@@ -3,6 +3,8 @@ Añadido:
 - BBDD por defecto
 - Argparse con los argumentos "-b" para bbdd y "-r" para recheck
 - Salida de la ejecución guardada en la bbdd
+- Archivo de configuración config.txt
+- Archivo requeriments.txt 
 
 Modificado:
 - Al ejecutar un comando se vuelven a listar los comandos para la herramienta
