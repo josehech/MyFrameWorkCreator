@@ -208,8 +208,8 @@ if __name__== "__main__":
     args = vars(parser.parse_args())
 
     # Fichero conf.txt
+    configuracion = dict()
     if args['config'] != None:
-        configuracion = dict()
         try:
             conf = open(args['config'])
             linea = conf.readline()
