@@ -6,62 +6,26 @@ import sqlite3 as dbapi
 import argparse
 from pyfiglet import Figlet
 
-
 def showBanner():
     custom_fig = Figlet(font=style)
     ascii_banner = custom_fig.renderText(frameworkname)
     print(ascii_banner)
     print()
 
-
-def showCommands(fname, ttypes, type, tool):
-    # Muestra los comandos disponibles
-    os.system("clear")
-    showBanner()
-    ncommands = 1
-    commandsoptions = dict()
-    for command in ttypes[type][tool]:
-        commandsoptions[ncommands] = command[0]
-        if 'comment' in command[1]:
-            print("[" + str(ncommands) + "]", command[0], '\t'+command[1]['comment'])
-        else:
-            print("[" + str(ncommands) + "]", command[0])
-        ncommands += 1
-    print()
-    print("[999] Volver")
-    print()
-
-    # Escoger el comando (hasta que llegue una entrada válida)
-    while True:
-        try:
-            sys.stdout.write(inputcolor)
-            option = int(input("Escoge el comando : "))
-            sys.stdout.write(primary)
-            if 0 < option < ncommands or option == 999:
-                break
-            else:
-                sys.stdout.write(warningcolor)
-                print("Error : Opción no válida")
-                sys.stdout.write(primary)
-        except ValueError:
-            sys.stdout.write(warningcolor)
-            print("Error : Opción no válida")
-            sys.stdout.write(primary)
-
-    # Si es 999 volver a la pantalla anterior
-    if option == 999:
-        showTools(fname, ttypes, type)
-
-    # Guardar la opción seleccionada
-    selectedcommand = commandsoptions[option]
-
+def executeCommand(ttypes, type, tool, selectedcommand):
+    sys.stdout.write(inputcolor)
+    print('Comando seleccionado :',selectedcommand)
     # Sustituir todos los parámetros del comando
     allmatches = re.findall(r"\[[^\]]+\]", selectedcommand)
     for match in allmatches:
         start=selectedcommand.find(match)
         end=start+len(match)
         sys.stdout.write(inputcolor)
-        variable=str(input("Indica el valor de la variable "+match[1:-1]+" : "))
+        if match[1:-1] not in configuracion.keys():
+            variable=str(input("Indica el valor del parámetro "+match[1:-1]+" : "))
+        else:
+            print('Asignando el valor',str(configuracion[match[1:-1]]),'al parámetro',match[1:-1])
+            variable = configuracion[match[1:-1]]
         sys.stdout.write(primary)
         selectedcommand = selectedcommand[:start]+variable+selectedcommand[end:]
     print()
@@ -71,7 +35,7 @@ def showCommands(fname, ttypes, type, tool):
     print()
 
     # Comprobar si existe una ejecución previa en la BBDD
-    c.execute('SELECT * FROM '+args['bbdd']+' WHERE (tooltype=? AND toolname=? AND command=?)', (type, tool, selectedcommand))
+    c.execute('SELECT * FROM '+args['table']+' WHERE (tooltype=? AND toolname=? AND command=?)', (type, tool, selectedcommand))
     entry = c.fetchone()
 
     # Si no existe, ejecutar el comando, guardarlo en output.txt y guardar la ejecución en la BBDD
@@ -79,7 +43,7 @@ def showCommands(fname, ttypes, type, tool):
         commandoutput = os.system(selectedcommand + ' 2>&1 | tee ./output.txt')
         with open("./output.txt", "r") as outputfile:
             terminaltext = outputfile.read()
-        c.execute("INSERT INTO "+args['bbdd']+" VALUES (?, ?, ?, ?)", (type,tool,selectedcommand,str(terminaltext)))
+        c.execute("INSERT INTO "+args['table']+" VALUES (?, ?, ?, ?)", (type,tool,selectedcommand,str(terminaltext)))
         bbdd.commit()
     else:
         # Si existe y está activado el flag --recheck, ejecutar el comando y actualizar la salida en la BBDD.
@@ -87,28 +51,86 @@ def showCommands(fname, ttypes, type, tool):
             commandoutput = os.system(selectedcommand + ' 2>&1 | tee ./output.txt')
             with open("./output.txt", "r") as outputfile:
                 terminaltext = outputfile.read()
-            c.execute('DELETE FROM '+args['bbdd']+' WHERE (tooltype=? AND toolname=? AND command=?)', (type, tool, selectedcommand))
+            c.execute('DELETE FROM '+args['table']+' WHERE (tooltype=? AND toolname=? AND command=?)', (type, tool, selectedcommand))
             bbdd.commit()
-            c.execute("INSERT INTO "+args['bbdd']+" VALUES (?, ?, ?, ?)", (type, tool, selectedcommand, str(terminaltext)))
+            c.execute("INSERT INTO "+args['table']+" VALUES (?, ?, ?, ?)", (type, tool, selectedcommand, str(terminaltext)))
             bbdd.commit()
-        # Si existe y no está activado el flag --recheck,
+        # Si existe y no está activado el flag --recheck, escapar la ejecución e imprimir la salida guardada.
         else:
             commandoutput = 0
             sys.stdout.write(warningcolor)
-            print('Se ha encontrado una ejecución previa en la BBDD')
+            print('[!] Se ha encontrado una ejecución previa en la BBDD. La salida ha sido la siguiente:')
+            sys.stdout.write(execolor)
+            print(entry[3])
+            sys.stdout.write(messagecolor)
+            print('Para volver a ejecutar el comando utiliza la opción -r o --recheck al ejecutar MyFrameworkName.py')
 
+    # Comprobar si hubo un error al ejecutar el comando
     sys.stdout.write(messagecolor)
     print()
     if commandoutput == 0:
         input("La ejecución ha finalizado. Comprueba la salida y pulsa Enter para continuar : ")
     else:
         sys.stdout.write(warningcolor)
-        input("La ejecución ha finalizado con una salida inesperada, compruebala y pulsa Enter para continuar : ")
+        input("[!] La ejecución ha finalizado con una salida inesperada, compruebala y pulsa Enter para continuar : ")
+
+def showCommands(ttypes, type, tool):
+    # Muestra los comandos disponibles
+    os.system("clear")
+    showBanner()
+    ncommands = 1
+    commandsoptions = dict()
+    for command in ttypes[type][tool]:
+        commandsoptions[ncommands] = command[0]
+        if 'comment' in command[1]:
+            print("[" + str(ncommands) + "]", command[0],end='')
+            sys.stdout.write(messagecolor)
+            print('\t'+command[1]['comment'])
+            sys.stdout.write(primary)
+        else:
+            print("[" + str(ncommands) + "]", command[0])
+        ncommands += 1
+    print()
+    print("[-1] Volver")
+    print("[-2] Ejecutar Todos")
+    print()
+
+    # Escoger el comando (hasta que llegue una entrada válida)
+    while True:
+        try:
+            sys.stdout.write(inputcolor)
+            option = int(input("Escoge el comando : "))
+            sys.stdout.write(primary)
+            if 0 < option < ncommands or option == -1 or option == -2:
+                break
+            else:
+                sys.stdout.write(warningcolor)
+                print("[!] Error : Opción no válida")
+                sys.stdout.write(primary)
+        except ValueError:
+            sys.stdout.write(warningcolor)
+            print("[!] Error : Opción no válida")
+            sys.stdout.write(primary)
+
+    # Si es -1 volver a la pantalla anterior
+    if option == -1:
+        showTools(ttypes, type)
+
+    # Guardar la opción seleccionada
+    if option == -2:
+        for number in range(1,ncommands):
+            selectedcommand = commandsoptions[number]
+            executeCommand(ttypes, type, tool, selectedcommand)
+    else:
+        selectedcommand = commandsoptions[option]
+        executeCommand(ttypes, type, tool, selectedcommand)
+    
+    # Mostrar los comandos al acabar la ejecución
     sys.stdout.write(primary)
-    showCommands(fname, ttypes, type,tool)
+    showCommands(ttypes, type,tool)
 
 
-def showTools(fname, ttypes, type):
+def showTools(ttypes, type):
     # Muestra las herramientas que pertenecen al tipo "type"
     os.system("clear")
     showBanner()
@@ -119,7 +141,7 @@ def showTools(fname, ttypes, type):
         print("[" + str(ntools) + "]", tool)
         ntools += 1
     print()
-    print("[999] Volver")
+    print("[-1] Volver")
     print()
 
     # Escoger la herramienta (hasta que llegue una entrada válida)
@@ -128,27 +150,27 @@ def showTools(fname, ttypes, type):
             sys.stdout.write(inputcolor)
             option = int(input("Escoge la herramienta a utilizar : "))
             sys.stdout.write(primary)
-            if 0 < option < ntools or option == 999:
+            if 0 < option < ntools or option == -1:
                 break
             else:
                 sys.stdout.write(warningcolor)
-                print("Error : Opción no válida")
+                print("[!] Error : Opción no válida")
                 sys.stdout.write(primary)
         except ValueError:
             sys.stdout.write(warningcolor)
-            print("Error : Opción no válida")
+            print("[!] Error : Opción no válida")
             sys.stdout.write(primary)
 
-    # Si es 999 ir a la pantalla anterior
-    if option == 999:
-        executeFramework(fname, ttypes)
+    # Si es -1 ir a la pantalla anterior
+    if option == -1:
+        executeFramework(ttypes)
 
     # Guarda la opción seleccionada
     selectedtool = toolsoptions[option]
-    showCommands(fname, ttypes, type, selectedtool)
+    showCommands(ttypes,type, selectedtool)
 
 
-def executeFramework(fname,ttypes):
+def executeFramework(ttypes):
     # Muestra los ToolTypes
     os.system("clear")
     showBanner()
@@ -159,7 +181,7 @@ def executeFramework(fname,ttypes):
         print("[" + str(ntypes) + "]", type)
         ntypes += 1
     print()
-    print("[999] Salir")
+    print("[-1] Salir")
     print()
 
     # Escoger el tipo de herramienta (hasta que llegue una entrada válida)
@@ -168,37 +190,59 @@ def executeFramework(fname,ttypes):
             sys.stdout.write(inputcolor)
             option = int(input("Escoge el tipo de herramienta : "))
             sys.stdout.write(primary)
-            if 0 < option < ntypes or option == 999:
+            if 0 < option < ntypes or option == -1:
                 break
             else:
                 sys.stdout.write(warningcolor)
-                print("Error : Opción no válida")
+                print("[!] Error : Opción no válida")
                 sys.stdout.write(primary)
         except ValueError:
             sys.stdout.write(warningcolor)
-            print("Error : Opción no válida")
+            print("[!] Error : Opción no válida")
             sys.stdout.write(primary)
-    # Si es 999 salir
-    if option == 999:
-        c.close()
-        bbdd.close()        
-        exit(0)
+
+    # Si es -1 salir
+    if option == -1:
+        return
 
     # Guarda la opción seleccionada
     selectedtype = typeoptions[option]
-    showTools(fname, ttypes, selectedtype)
+    showTools(ttypes,selectedtype)
 
 
 if __name__== "__main__":
     # Argument Parser
     parser = argparse.ArgumentParser()
-    parser.add_argument('-b', '--bbdd', default='testing')
+    parser.add_argument('-t', '--table', default='testing')
     parser.add_argument('-r', '--recheck', action='store_true')
+    parser.add_argument('-c', '--config')
     args = vars(parser.parse_args())
+
+    # Fichero conf.txt
+    configuracion = dict()
+    if args['config'] != None:
+        try:
+            conf = open(args['config'])
+            linea = conf.readline()
+            while linea:
+                if len(linea) != 0:
+                    splited = str(linea).split("=", 1)
+                    if len(splited) != 2:
+                        print("Error en el archivo de configuración")
+                        exit(1)
+                    param = splited[0].strip()
+                    val = splited[1].strip()
+                    configuracion[param] = val
+                linea = conf.readline()
+            conf.close()
+        except IOError:
+            print("Fichero de configuración",args['config'],"no encontrado")
+            input("Pulsa Enter para continuar sin el archivo de configuración : ")
+
     # BBDD
     bbdd = dbapi.connect("bbdd.dat")
     c = bbdd.cursor()
-    c.execute("create table if not exists "+args['bbdd']+" (tooltype text, toolname text, command text, result text)")
+    c.execute("create table if not exists "+args['table']+" (tooltype text, toolname text, command text, result text)")
     
     # XML Parser
     doc = ET.parse("tools.xml")
@@ -229,7 +273,7 @@ if __name__== "__main__":
         if programname.text not in ToolTypes[type.text]:
             ToolTypes[type.text][programname.text] = []
         for commands in tool.findall("./command"):
-            ToolTypes[type.text][programname.text].append((commands.text,commands.attrib))
+            ToolTypes[type.text][programname.text].append((commands.text, commands.attrib))
 
     # Colores
     primary = "\033[1;34m"
@@ -241,18 +285,19 @@ if __name__== "__main__":
     # Gestión de excepciones
     try:
         sys.stdout.write(primary)
-        executeFramework(frameworkname, ToolTypes)
+        executeFramework(ToolTypes)
     except KeyboardInterrupt:
+        # Ctrl + C
         print()
         sys.stdout.write(warningcolor)
-        print("OK. Saliendo...")
-        c.close()
-        bbdd.close()
-        sys.exit()
+        print("[!] OK. Saliendo...")
     except EOFError:
+        # Ctrl + D
         print()
         sys.stdout.write(warningcolor)
-        print("OK. Saliendo...")
+        print("[!] OK. Saliendo...")
+    finally:
         c.close()
         bbdd.close()
         sys.exit()
+

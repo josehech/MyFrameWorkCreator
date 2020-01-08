@@ -23,15 +23,78 @@
         <command>dnsrecon -D /usr/share/dnsrecon/namelist.txt -d [domain] -t brt -v</command>
     </tool>
     <tool>
-        <tooltype>Scan-Enum</tooltype>
-        <programname>Nmap</programname>
-        <command>nmap -Pn [hostname]</command>
-        <command>nmap -sn [CIDR]</command>
+        <tooltype>Headers Info</tooltype>
+        <programname>Curl</programname>
+        <command comment="Imprime las cabeceras de la peticion">curl -X [METHOD] -I [URL]</command>
+        <command comment="#Petición GET sin verificar los certificados HTTPS">curl -k -X GET [URL] </command>
     </tool>
     <tool>
-        <tooltype>Scan-Enum</tooltype>
+        <tooltype>SSL Configuration</tooltype>
+        <programname>dnsrecon</programname>
+        <command comment="Test de la configuración SSL">./testssl/testssl.sh --color 3 [URL]</command>
+    </tool>
+    <tool>
+        <tooltype>Scan</tooltype>
+        <programname>Nmap</programname>
+        <command comment="#Asume que el servidor está activo">nmap -Pn [hostname]</command>
+        <command comment="#Buscar dispositivos conectados a la red">nmap -sn [CIDR]</command>
+        <command comment="#General con velocidad 4">sudo nmap -T4 [remote_host]</command>
+        <command comment="#General con velocidad 1">sudo nmap -T1 [remote_host]</command>
+        <command comment="#Intense scanning and all ports (aprox.1 hour)">sudo nmap -T4 -A -p- [remote_host]</command>
+        <command comment="#Intense scanning on ports 80 and 443(aprox.1 hour)">sudo nmap -T4 -A -p80,443 [remote_host]</command>
+        <command comment="#Deteccion de sistema operativo">sudo nmap -O [remote_host]</command>
+        <command comment="#Escanear conexiones TCP">sudo nmap -sT [remote_host]</command>
+        <command comment="#Escanear conexiones UDP">sudo nmap -sU [remote_host]</command>
+        <command comment="#Escaner SYN">sudo nmap -sS [remote_host]</command>
+        <command comment="#Will scan all IPs that a DNS name resolves to, not just the first IP.">sudo nmap --resolve-all [remote_host]</command>
+        <command comment="#Escanear e intentar determinar la version de los servicios">sudo nmap -PN -p [PUERTO] -sV [remote_host]</command>
+        <command comment="#Escaner Eternalblue">sudo nmap -p 3389 --script=smb-vuln-ms17-010 [remote_host]</command>
+        <command comment="#Escaner de cifrados permitidos">sudo nmap -p 443 --script=ssl-enum-ciphers [remote_host]</command>
+    </tool>
+    <tool>
+        <tooltype>Subdomain Enum</tooltype>
+        <programname>Curl</programname>
+        <command comment="#crt.sh">curl 'https://crt.sh/?q=%.'[domainname]'&amp;output=json' | jq .[].name_value -r | sed 's/\"//g' | sed 's/\*\.//g' | sort -u</command>
+        <command comment="#threatcrowd">curl -s https://www.threatcrowd.org/searchApi/v2/domain/report/?domain=[domainname] | jq -r '.subdomains | .[]' | sort -u </command>
+        <command comment="#wayback">curl -s "http://web.archive.org/cdx/search/cdx?url=*.[domainname]/*&amp;output=text&amp;fl=original&amp;collapse=urlkey" |sort| sed -e 's_https*://__' -e "s/\/.*//" -e 's/:.*//' -e 's/^www\.//' | uniq</command>
+    </tool>
+    <tool>
+        <tooltype>Subdomain Enum</tooltype>
+        <programname>Subfinder</programname>
+        <command>subfinder -d [domainname] -v</command>
+    </tool>
+    <tool>
+        <tooltype>Subdomain Enum</tooltype>
+        <programname>Sublist3r</programname>
+        <command comment="#Scan the found subdomains against specific tcp ports ">python ./sublist3r/sublist3r.py -d [domainname] -p 80,443</command>
+        <command comment="#Verbose">python ./sublist3r/sublist3r.py -v -d [domainname]</command>
+        <command comment="#Specific search engines">python ./sublist3r/sublist3r.py -e google,yahoo,virustotal -d [domainname]</command>
+    </tool>
+    <tool>
+        <tooltype>Subdomain Enum</tooltype>
+        <programname>ffuf</programname>
+        <command comment="#Fuzz common wordlist and specific response codes">./ffuf -w /usr/share/wordlists/dirb/common.txt -u https://FUZZ.prosegur.com/ -mc 200,300,301,302</command>
+        <command comment="#Fuzz custom wordlist and specific response codes">./ffuf -w [WORDLIST] -u https://FUZZ.prosegur.com/ -mc 200,300,301,302</command>
+    </tool>
+    <tool>
+        <tooltype>Directory Enum</tooltype>
         <programname>Dirb</programname>
-        <command>dirb [hostname]</command>
+        <command comment="#Enum common wordlist">dirb [hostname]</command>
+        <command comment="#Enum custom wordlist">dirb [hostname] [WORDLIST]</command>
+    </tool>
+    <tool>
+        <tooltype>Directory Enum</tooltype>
+        <programname>Dirsearch</programname>
+        <command comment="#Enum common wordlist and exclude error responses">python3 ./dirsearch/dirsearch.py -u [URL] -e -f -w /usr/share/wordlists/dirb/common.txt -t 50 --exclude-status=400,404,405,406,429,500,502,503,504,000</command>
+        <command comment="#Enum custom wordlist and exclude error responses">python3 ./dirsearch/dirsearch.py -u [URL] -e -f -w [WORDLIST] -t 50 --exclude-status=400,404,405,406,429,500,502,503,504,000</command>
+    </tool>
+    <tool>
+        <tooltype>Vuln Scan</tooltype>
+        <programname>Nikto</programname>
+        <command comment="#Basic">nikto -h [URL]</command>
+        <command comment="#Random URI encoding">nikto -e 1 -h [URL]</command>
+        <command comment="#Specific port">nikto -h [URL] -p [PUERTO]</command>
+        <command comment="Scan all CGI dirs">nikto -C all -h [URL]</command>
     </tool>
     <tool>
         <tooltype>Exploits</tooltype>
