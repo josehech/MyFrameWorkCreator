@@ -25,13 +25,13 @@
     <tool>
         <tooltype>Headers Info</tooltype>
         <programname>Curl</programname>
-        <command comment="Imprime las cabeceras de la peticion">curl -X [METHOD] -I [URL]</command>
+        <command comment="#Imprime las cabeceras de la peticion">curl -X [METHOD] -I [URL]</command>
         <command comment="#Petición GET sin verificar los certificados HTTPS">curl -k -X GET [URL] </command>
     </tool>
     <tool>
         <tooltype>SSL Configuration</tooltype>
         <programname>dnsrecon</programname>
-        <command comment="Test de la configuración SSL">./testssl/testssl.sh --color 3 [URL]</command>
+        <command comment="#Test de la configuración SSL">./testssl/testssl.sh --color 3 [URL]</command>
     </tool>
     <tool>
         <tooltype>Scan</tooltype>
