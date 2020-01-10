@@ -38,7 +38,7 @@ El archivo config_example.txt es un ejemplo de archivo de configuración de vari
 git clone https://github.com/josehech/MyFrameWorkCreator.git
 cd MyFrameWorkCreator/
 sudo apt-get install python3-pyfiglet
-pip install -r requeriments.txt
+pip install -r requirements.txt
 ~~~
 
 ### Uso
