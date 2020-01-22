@@ -58,6 +58,12 @@ pip install -r requirements.txt
 -t table_name , --table table_name  #Tabla que guardará los datos de los comandos ejecutados (por defecto testing)
 -c config_file, --config_file   #Fichero que asigna valors por defecto a los parámetros
 ~~~
-### Features
+### Características
+- BBDD
+- Múltiples tablas en BBDD
+- Capacidad para reejecutar comandos disponibles en BBDD
+- Archivo de configuración
+- Reconocimiento de parámetros
+- Comentarios en los comandos
+- Distinción de mensajes por colores
 - Automatización de un conjunto de comandos
-- Generación de informe/dashboard a partir de la bbdd
