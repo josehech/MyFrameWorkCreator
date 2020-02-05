@@ -73,8 +73,8 @@
     <tool>
         <tooltype>Subdomain Enum</tooltype>
         <programname>ffuf</programname>
-        <command comment="#Fuzz common wordlist and specific response codes">./ffuf -w /usr/share/wordlists/dirb/common.txt -u https://FUZZ.prosegur.com/ -mc 200,300,301,302</command>
-        <command comment="#Fuzz custom wordlist and specific response codes">./ffuf -w [WORDLIST] -u https://FUZZ.prosegur.com/ -mc 200,300,301,302</command>
+        <command comment="#Fuzz common wordlist and specific response codes">./ffuf -w /usr/share/wordlists/dirb/common.txt -u https://FUZZ.[domainname]/ -mc 200,300,301,302</command>
+        <command comment="#Fuzz custom wordlist and specific response codes">./ffuf -w [WORDLIST] -u https://FUZZ.[domainname]/ -mc 200,300,301,302</command>
     </tool>
     <tool>
         <tooltype>Directory Enum</tooltype>
