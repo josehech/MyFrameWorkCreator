@@ -59,11 +59,11 @@ pip install -r requirements.txt
 -c config_file, --config_file   #Fichero que asigna valors por defecto a los parámetros
 ~~~
 ### Características
-- BBDD
-- Múltiples tablas en BBDD
-- Capacidad para reejecutar comandos disponibles en BBDD
-- Archivo de configuración
-- Reconocimiento de parámetros
-- Comentarios en los comandos
-- Distinción de mensajes por colores
-- Automatización de un conjunto de comandos
+- [X] Guarda salida previas en BBDD
+- [X] Múltiples tablas en BBDD
+- [X] Archivo de configuración
+- [X] Reconocimiento de parámetros
+- [X] Comentarios en los comandos
+- [X] Distinción de mensajes por colores
+- [X] Automatización de un conjunto de comandos
+- [X] Ejecución por índices
