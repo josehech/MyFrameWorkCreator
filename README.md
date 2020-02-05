@@ -56,11 +56,15 @@ pip install -r requirements.txt
 ~~~sh
 -r , --recheck  #Flag que fuerza ejecutar los comandos aunque se encuentren en la BBDD (CUIDADO, borra los datos anteriores)
 -t table_name , --table table_name  #Tabla que guardará los datos de los comandos ejecutados (por defecto testing)
--c config_file, --config_file   #Fichero que asigna valors por defecto a los parámetros
+-c config_file, --config_file   #Fichero que asigna valores por defecto a los parámetros
 ~~~
 ### Características
+- [X] Banner personalizado
+- [X] Estilo de Banner personalizado con pyfiglet
 - [X] Guarda salida previas en BBDD
 - [X] Múltiples tablas en BBDD
+- [X] Opción para ver datos de una tabla
+- [X] Opción para ver las tablas que alamacena la BBDD
 - [X] Archivo de configuración
 - [X] Reconocimiento de parámetros
 - [X] Comentarios en los comandos
