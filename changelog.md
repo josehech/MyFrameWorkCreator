@@ -1,3 +1,17 @@
+# v1.0
+Añadido:
+- Opción -3 para ejecutar por indices
+- Opción para imprimir los datos de una tabla
+- Fichero showbbdd.py
+- Opcion para imprimir las tablas de la bbdd
+- Fichero showtables.py
+Modificado:
+- Detección de Ctrl+C al insertar parámetros. Ahora vuelve a mostrar los comandos en lugar de salir del programa.
+- Correciones de ortografía.
+- Al existir una entrada en la BBDD y no tener recheck activado se pregunta si desea eliminar la entrada y volver a ejecutar.
+- Bugs con opcion -1
+Eliminado:
+
 # v0.0.3a
 Añadido:
 - BBDD por defecto

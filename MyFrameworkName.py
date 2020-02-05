@@ -62,17 +62,28 @@ def executeCommand(ttypes, type, tool, selectedcommand):
             print('[!] Se ha encontrado una ejecución previa en la BBDD. La salida ha sido la siguiente:')
             sys.stdout.write(execolor)
             print(entry[3])
+            sys.stdout.write(inputcolor)
+            rerun = input('¿Quieres eliminar esta salida de la BBDD y volver a ejecutar el comando? (s/n) : ')
+            if rerun in ['s','S']:
+                sys.stdout.write(execolor)
+                commandoutput = os.system(selectedcommand + ' 2>&1 | tee ./output.txt')
+                with open("./output.txt", "r") as outputfile:
+                    terminaltext = outputfile.read()
+                c.execute('DELETE FROM '+args['table']+' WHERE (tooltype=? AND toolname=? AND command=?)', (type, tool, selectedcommand))
+                bbdd.commit()
+                c.execute("INSERT INTO "+args['table']+" VALUES (?, ?, ?, ?)", (type, tool, selectedcommand, str(terminaltext)))
+                bbdd.commit()
             sys.stdout.write(messagecolor)
-            print('Para volver a ejecutar el comando utiliza la opción -r o --recheck al ejecutar MyFrameworkName.py')
+            print('Puedes utilizar la opción -r o --recheck para omitir la salida de la BBDD')
 
     # Comprobar si hubo un error al ejecutar el comando
     sys.stdout.write(messagecolor)
     print()
     if commandoutput == 0:
-        input("La ejecución ha finalizado. Comprueba la salida y pulsa Enter para continuar : ")
+        input("La ejecución ha finalizado. Comprueba la salida y pulsa ENTER para continuar : ")
     else:
         sys.stdout.write(warningcolor)
-        input("[!] La ejecución ha finalizado con una salida inesperada, compruebala y pulsa Enter para continuar : ")
+        input("[!] La ejecución ha finalizado con una salida inesperada, compruebala y pulsa ENTER para continuar : ")
 
 def showCommands(ttypes, type, tool):
     # Muestra los comandos disponibles
@@ -92,7 +103,8 @@ def showCommands(ttypes, type, tool):
         ncommands += 1
     print()
     print("[-1] Volver")
-    print("[-2] Ejecutar Todos")
+    print("[-2] Ejecutar todos")
+    print("[-3] Ejecutar por índices")
     print()
 
     # Escoger el comando (hasta que llegue una entrada válida)
@@ -101,7 +113,7 @@ def showCommands(ttypes, type, tool):
             sys.stdout.write(inputcolor)
             option = int(input("Escoge el comando : "))
             sys.stdout.write(primary)
-            if 0 < option < ncommands or option == -1 or option == -2:
+            if 0 < option < ncommands or option == -1 or option == -2 or option == -3:
                 break
             else:
                 sys.stdout.write(warningcolor)
@@ -111,20 +123,34 @@ def showCommands(ttypes, type, tool):
             sys.stdout.write(warningcolor)
             print("[!] Error : Opción no válida")
             sys.stdout.write(primary)
+    try:
+        # Si es -1 volver a la pantalla anterior
+        if option == -1:
+            return
 
-    # Si es -1 volver a la pantalla anterior
-    if option == -1:
-        showTools(ttypes, type)
-
-    # Guardar la opción seleccionada
-    if option == -2:
-        for number in range(1,ncommands):
-            selectedcommand = commandsoptions[number]
+        # Guardar la opción seleccionada
+        elif option == -2:
+            for number in range(1,ncommands):
+                selectedcommand = commandsoptions[number]
+                executeCommand(ttypes, type, tool, selectedcommand)
+        elif option == -3:
+            lista_raw=input('Introduce los indices separados por un espacio (p.e:2 4 5 7): ')
+            lista_numeros = [int(x) for x in lista_raw.split()]
+            for number in lista_numeros:
+                if 0 < number < ncommands:
+                    selectedcommand = commandsoptions[number]
+                    executeCommand(ttypes, type, tool, selectedcommand)
+        else:
+            selectedcommand = commandsoptions[option]
             executeCommand(ttypes, type, tool, selectedcommand)
-    else:
-        selectedcommand = commandsoptions[option]
-        executeCommand(ttypes, type, tool, selectedcommand)
-    
+    except KeyboardInterrupt:
+        # Ctrl + C
+        print()
+        sys.stdout.write(warningcolor)
+        input("[!] Cancelando ejecución. Pulsa ENTER para continuar...")
+    except ValueError:
+        sys.stdout.write(warningcolor)
+        input("[!] Entrada no válida. Pulsa ENTER para continuar...")
     # Mostrar los comandos al acabar la ejecución
     sys.stdout.write(primary)
     showCommands(ttypes, type,tool)
@@ -163,12 +189,12 @@ def showTools(ttypes, type):
 
     # Si es -1 ir a la pantalla anterior
     if option == -1:
-        executeFramework(ttypes)
+        return
 
     # Guarda la opción seleccionada
     selectedtool = toolsoptions[option]
     showCommands(ttypes,type, selectedtool)
-
+    showTools(ttypes,type)
 
 def executeFramework(ttypes):
     # Muestra los ToolTypes
@@ -208,16 +234,25 @@ def executeFramework(ttypes):
     # Guarda la opción seleccionada
     selectedtype = typeoptions[option]
     showTools(ttypes,selectedtype)
+    executeFramework(ttypes)
 
 
 if __name__== "__main__":
     # Argument Parser
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-t', '--table', default='testing')
-    parser.add_argument('-r', '--recheck', action='store_true')
-    parser.add_argument('-c', '--config')
+    parser = argparse.ArgumentParser(description='ejemplo : python3 MyFrameworkName.py -t secondtable -c config_example.txt -r')
+    parser.add_argument('-t', '--table', default='testing', help='Especifica el nombre de la tabla en la BBDD (por defecto = testing)')
+    parser.add_argument('-r', '--recheck', action='store_true', help='Ejecuta el comando aunque haya una salida previa en la BBDD')
+    parser.add_argument('-c', '--config', help='Especifica el archivo de configuración')
+    parser.add_argument('-sb', '--showbbdd', action='store_true', help='Muestra los datos de la tabla especificada o testing si no se indica')
+    parser.add_argument('-st', '--showtables', action='store_true', help='Muestra todas las tablas creadas en la BBDD')
     args = vars(parser.parse_args())
-
+    
+    if args['showbbdd']:
+        os.system('python3 showbbdd.py '+ args['table'])
+        sys.exit()
+    if args['showtables']:
+        os.system('python3 showtables.py')
+        sys.exit()
     # Fichero conf.txt
     configuracion = dict()
     if args['config'] != None:
@@ -237,8 +272,8 @@ if __name__== "__main__":
             conf.close()
         except IOError:
             print("Fichero de configuración",args['config'],"no encontrado")
-            input("Pulsa Enter para continuar sin el archivo de configuración : ")
-
+            input("Pulsa ENTER para continuar sin el archivo de configuración : ")
+    
     # BBDD
     bbdd = dbapi.connect("bbdd.dat")
     c = bbdd.cursor()
