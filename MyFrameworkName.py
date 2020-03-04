@@ -4,6 +4,7 @@ import re
 import os
 import sqlite3 as dbapi
 import argparse
+import readline
 from pyfiglet import Figlet
 
 def showBanner():
