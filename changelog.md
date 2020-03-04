@@ -1,5 +1,6 @@
 # v1.0
 Añadido:
+- fastmode
 - Opción -3 para ejecutar por indices
 - Opción para imprimir los datos de una tabla
 - Fichero showbbdd.py

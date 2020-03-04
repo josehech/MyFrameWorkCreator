@@ -63,10 +63,15 @@ def executeCommand(ttypes, type, tool, selectedcommand):
             print('[!] Se ha encontrado una ejecución previa en la BBDD. La salida ha sido la siguiente:')
             sys.stdout.write(execolor)
             print(entry[3])
+            rerun = str()
+            if args['fastmode']:
+                rerun = 'n'
             sys.stdout.write(inputcolor)
-            rerun = input('¿Quieres eliminar esta salida de la BBDD y volver a ejecutar el comando? (s/n) : ')
+            while rerun == "":
+                rerun = str(input('¿Quieres eliminar esta salida de la BBDD y volver a ejecutar el comando? (s/n) : '))
+            sys.stdout.write(execolor)
+            print()
             if rerun in ['s','S']:
-                sys.stdout.write(execolor)
                 commandoutput = os.system(selectedcommand + ' 2>&1 | tee ./output.txt')
                 with open("./output.txt", "r") as outputfile:
                     terminaltext = outputfile.read()
@@ -76,15 +81,12 @@ def executeCommand(ttypes, type, tool, selectedcommand):
                 bbdd.commit()
             sys.stdout.write(messagecolor)
             print('Puedes utilizar la opción -r o --recheck para omitir la salida de la BBDD')
-
+    os.system('rm ./output.txt 2>/dev/null')
     # Comprobar si hubo un error al ejecutar el comando
-    sys.stdout.write(messagecolor)
     print()
-    if commandoutput == 0:
-        input("La ejecución ha finalizado. Comprueba la salida y pulsa ENTER para continuar : ")
-    else:
+    if commandoutput != 0:
         sys.stdout.write(warningcolor)
-        input("[!] La ejecución ha finalizado con una salida inesperada, compruebala y pulsa ENTER para continuar : ")
+        input("[!] La ejecución ha finalizado de forma inesperada, pulsa ENTER para continuar : ")
 
 def showCommands(ttypes, type, tool):
     # Muestra los comandos disponibles
@@ -133,7 +135,14 @@ def showCommands(ttypes, type, tool):
         elif option == -2:
             for number in range(1,ncommands):
                 selectedcommand = commandsoptions[number]
-                executeCommand(ttypes, type, tool, selectedcommand)
+                wantcontinue = str()
+                if args['fastmode']:
+                    wantcontinue = 's'
+                while wantcontinue == "":
+                    sys.stdout.write(inputcolor)
+                    wantcontinue = input('¿Quieres ejecutar "'+selectedcommand+'" ?: ')
+                if wantcontinue in ['s','S']:
+                    executeCommand(ttypes, type, tool, selectedcommand)
         elif option == -3:
             lista_raw=input('Introduce los indices separados por un espacio (p.e:2 4 5 7): ')
             lista_numeros = [int(x) for x in lista_raw.split()]
@@ -144,6 +153,8 @@ def showCommands(ttypes, type, tool):
         else:
             selectedcommand = commandsoptions[option]
             executeCommand(ttypes, type, tool, selectedcommand)
+        sys.stdout.write(warningcolor)
+        input("[!] La ejecución ha finalizado. Comprueba la salida y pulsa ENTER para continuar : ")
     except KeyboardInterrupt:
         # Ctrl + C
         print()
@@ -237,22 +248,53 @@ def executeFramework(ttypes):
     showTools(ttypes,selectedtype)
     executeFramework(ttypes)
 
+def printdata(tablename):
+    # Colores
+    red = "\033[1;31m"
+    purple = "\033[1;35m"
 
+    # BBDD
+    bbdd = dbapi.connect("bbdd.dat")
+    c = bbdd.cursor()
+    c.execute('SELECT * FROM '+ tablename)
+    entry = c.fetchall()
+    for table in entry:
+        sys.stdout.write(red)
+        print(table[0:3])
+        sys.stdout.write(purple)
+        print(table[3])
+    c.close()
+    bbdd.close()
+def printtables():
+    # Colores
+    green = "\033[1;32m"
+    purple = "\033[1;35m"
+
+    # BBDD
+    bbdd = dbapi.connect("bbdd.dat")
+    c = bbdd.cursor()
+    c.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    sys.stdout.write(purple)
+    for table in c.fetchall():
+        print(table[0])
+    c.close()
+    bbdd.close()
 if __name__== "__main__":
     # Argument Parser
     parser = argparse.ArgumentParser(description='ejemplo : python3 MyFrameworkName.py -t secondtable -c config_example.txt -r')
     parser.add_argument('-t', '--table', default='testing', help='Especifica el nombre de la tabla en la BBDD (por defecto = testing)')
     parser.add_argument('-r', '--recheck', action='store_true', help='Ejecuta el comando aunque haya una salida previa en la BBDD')
     parser.add_argument('-c', '--config', help='Especifica el archivo de configuración')
-    parser.add_argument('-sb', '--showbbdd', action='store_true', help='Muestra los datos de la tabla especificada o testing si no se indica')
-    parser.add_argument('-st', '--showtables', action='store_true', help='Muestra todas las tablas creadas en la BBDD')
+    parser.add_argument('-f', '--fastmode',action='store_true', help='Evita preguntas')
+    parser.add_argument('-st', '--showtables', action='store_true', help='Muestra todas las tablas creadas en la BBDD.')
+    parser.add_argument('-sb', '--showdata', help='Muestra los datos de la tabla especificada o testing si no se indica (ej. python3 <frameworkwname>.py --showdata <tablename>)')
     args = vars(parser.parse_args())
     
-    if args['showbbdd']:
-        os.system('python3 showbbdd.py '+ args['table'])
+    if args['showdata'] != None:
+        printdata(args['showdata'])
         sys.exit()
     if args['showtables']:
-        os.system('python3 showtables.py')
+        printtables()
         sys.exit()
     # Fichero conf.txt
     configuracion = dict()
