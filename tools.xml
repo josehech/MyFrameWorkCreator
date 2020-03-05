@@ -6,37 +6,36 @@
     </frameworkproperties>
     <tool>
         <tooltype>OSINT</tooltype>
-        <programname>Whois</programname>
-        <command>whois [domainname]</command>
-    </tool>
-    <tool>
-        <tooltype>OSINT</tooltype>
-        <programname>host</programname>
-        <command>host [domain]</command>
-        <command>host -l [domain]</command>
-        <command>host -l [domain] [dns_server]</command>
-    </tool>
-    <tool>
-        <tooltype>OSINT</tooltype>
         <programname>dnsrecon</programname>
-        <command>dnsrescon -r [CIDR]</command>
-        <command>dnsrecon -D /usr/share/dnsrecon/namelist.txt -d [domain] -t brt -v</command>
+        <command>theHarvester -d [URL] -b [SearchEngine]</command>
+        </tool>
+    <tool>
+        <tooltype>Info Gathering</tooltype>
+        <programname>Whois</programname>
+        <command>whois [hostname]</command>
+    </tool>
+    <tool>
+        <tooltype>Info Gathering</tooltype>
+        <programname>host</programname>
+        <command>host [hostname]</command>
+        <command>host -l [hostname]</command>
+        <command>host -l [hostname] [dns_server]</command>
     </tool>
     <tool>
         <tooltype>Headers Info</tooltype>
         <programname>Curl</programname>
-        <command comment="#Imprime las cabeceras de la peticion">curl -X [METHOD] -I [URL]</command>
-        <command comment="#Petición GET sin verificar los certificados HTTPS">curl -k -X GET [URL] </command>
+        <command comment="#Imprime las cabeceras de la peticion (GET,POST,OPTIONS,etc)">curl -X [method] -I [url]</command>
+        <command comment="#Petición GET sin verificar los certificados HTTPS">curl -k -X GET [url] </command>
     </tool>
     <tool>
         <tooltype>SSL Configuration</tooltype>
-        <programname>dnsrecon</programname>
-        <command comment="#Test de la configuración SSL">./testssl/testssl.sh --color 3 [URL]</command>
+        <programname>testssl</programname>
+        <command comment="#Test de la configuración SSL">./testssl/testssl.sh --color 3 [url]</command>
     </tool>
     <tool>
         <tooltype>Scan</tooltype>
         <programname>Nmap</programname>
-        <command comment="#Asume que el servidor está activo">nmap -Pn [hostname]</command>
+        <command comment="#Asume que el servidor está activo">nmap -Pn [remote_host]</command>
         <command comment="#Buscar dispositivos conectados a la red">nmap -sn [CIDR]</command>
         <command comment="#General con velocidad 4">sudo nmap -T4 [remote_host]</command>
         <command comment="#General con velocidad 1">sudo nmap -T1 [remote_host]</command>
@@ -47,7 +46,7 @@
         <command comment="#Escanear conexiones UDP">sudo nmap -sU [remote_host]</command>
         <command comment="#Escaner SYN">sudo nmap -sS [remote_host]</command>
         <command comment="#Will scan all IPs that a DNS name resolves to, not just the first IP.">sudo nmap --resolve-all [remote_host]</command>
-        <command comment="#Escanear e intentar determinar la version de los servicios">sudo nmap -PN -p [PUERTO] -sV [remote_host]</command>
+        <command comment="#Escanear e intentar determinar la version de los servicios">sudo nmap -PN -p [port] -sV [remote_host]</command>
         <command comment="#Escaner Eternalblue">sudo nmap -p 3389 --script=smb-vuln-ms17-010 [remote_host]</command>
         <command comment="#Escaner de cifrados permitidos">sudo nmap -p 443 --script=ssl-enum-ciphers [remote_host]</command>
     </tool>
@@ -80,31 +79,36 @@
         <tooltype>Directory Enum</tooltype>
         <programname>Dirb</programname>
         <command comment="#Enum common wordlist">dirb [hostname]</command>
-        <command comment="#Enum custom wordlist">dirb [hostname] [WORDLIST]</command>
+        <command comment="#Enum custom wordlist">dirb [hostname] [wordlist]</command>
     </tool>
     <tool>
         <tooltype>Directory Enum</tooltype>
         <programname>Dirsearch</programname>
-        <command comment="#Enum common wordlist and exclude error responses">python3 ./dirsearch/dirsearch.py -u [URL] -e -f -w /usr/share/wordlists/dirb/common.txt -t 50 --exclude-status=400,404,405,406,429,500,502,503,504,000</command>
-        <command comment="#Enum custom wordlist and exclude error responses">python3 ./dirsearch/dirsearch.py -u [URL] -e -f -w [WORDLIST] -t 50 --exclude-status=400,404,405,406,429,500,502,503,504,000</command>
+        <command comment="#Enum common wordlist and exclude error responses">python3 ./dirsearch/dirsearch.py -u [url] -e -f -w /usr/share/wordlists/dirb/common.txt -t 50 --exclude-status=400,404,405,406,429,500,502,503,504,000</command>
+        <command comment="#Enum custom wordlist and exclude error responses">python3 ./dirsearch/dirsearch.py -u [url] -e -f -w [wordlist] -t 50 --exclude-status=400,404,405,406,429,500,502,503,504,000</command>
     </tool>
     <tool>
         <tooltype>Vuln Scan</tooltype>
         <programname>Nikto</programname>
         <command comment="#Basic">nikto -h [URL]</command>
-        <command comment="#Random URI encoding">nikto -e 1 -h [URL]</command>
-        <command comment="#Specific port">nikto -h [URL] -p [PUERTO]</command>
-        <command comment="Scan all CGI dirs">nikto -C all -h [URL]</command>
+        <command comment="#Random URI encoding">nikto -e 1 -h [url]</command>
+        <command comment="#Specific port">nikto -h [url] -p [port]</command>
+        <command comment="Scan all CGI dirs">nikto -C all -h [url]</command>
     </tool>
     <tool>
         <tooltype>Exploits</tooltype>
         <programname>FTP</programname>
-        <command comment="#FTP-Bruteforce Exploit">hydra -L /usr/share/wordlists/dirb/common.txt -P /usr/share/wordlists/dirb/common.txt -s [PUERTO] -e nsr -v -V -I [IP] ftp</command>
+        <command comment="#FTP-Bruteforce Exploit">hydra -L /usr/share/wordlists/dirb/common.txt -P /usr/share/wordlists/dirb/common.txt -s [port] -e nsr -v -V -I [ip] ftp</command>
+    </tool>
+    <tool>
+        <tooltype>Exploits</tooltype>
+        <programname>HTTP Forms</programname>
+        <command comment="#Forms Bruteforce">hydra [hostname] -V -L [usernamelist] -P [passwordlist] http-get-form "[path]:[usernameparam]=^USER^&[passwordparam]=^PASS^[optionalparams]:"</command>
     </tool>
     <tool>
         <tooltype>Post-Exploit</tooltype>
         <programname>FTP</programname>
-        <command comment="#FTP-DirListing Exploit">lftp -u '[USER],[PASSWORD]' -p [PUERTO] [IP] -e "find -d 4 .;exit"</command>
+        <command comment="#FTP-DirListing Exploit">lftp -u '[user],[password]' -p [port] [ip] -e "find -d 4 .;exit"</command>
     </tool>
     <tool>
         <tooltype>Others Commands</tooltype>

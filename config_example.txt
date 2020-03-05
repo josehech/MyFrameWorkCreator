@@ -1,6 +1,7 @@
-IP = 192.168.0.1
+ip = 192.168.0.1
 CIDR = 192.168.0.0/24
-PUERTO = 80
-USER = example
-PASSWORD = example
+port = 80
+user = example
+password = example
 domain = example.com
+SearchEngine = googleCSE
