@@ -103,7 +103,7 @@
     <tool>
         <tooltype>Exploits</tooltype>
         <programname>HTTP Forms</programname>
-        <command comment="#Forms Bruteforce">hydra [hostname] -V -L [usernamelist] -P [passwordlist] http-get-form "[path]:[usernameparam]=^USER^&[passwordparam]=^PASS^[optionalparams]:"</command>
+        <command comment="#Forms Bruteforce">hydra [hostname] -V -L [usernamelist] -P [passwordlist] http-get-form "[path]:[usernameparam]=^USER^&amp;[passwordparam]=^PASS^[optionalparams]:"</command>
     </tool>
     <tool>
         <tooltype>Post-Exploit</tooltype>
